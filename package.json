@@ -1,0 +1,49 @@
+{
+  "name": "esbuild-ts-lib-starter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.cjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./types/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "types",
+    "package.json"
+  ],
+  "scripts": {
+    "build:cjs": "esbuild src/index.ts --bundle --format=cjs --outfile=dist/index.cjs",
+    "build:esm": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.mjs",
+    "build": "tsc && npm run build:esm && npm run build:cjs",
+    "build:node:cjs": "npm run build:cjs -- --platform=node",
+    "build:node:esm": "npm run build:esm -- --platform=node",
+    "build:node": "tsc && npm run build:node:esm && npm run build:node:cjs",
+    "watch": "concurrently \"tsc --watch\" \"npm run build:esm -- --watch\" \"npm run build:cjs -- --watch\"",
+    "watch:node": "concurrently \"tsc --watch\" \"npm run build:node:esm -- --watch\" \"npm run build:node:cjs -- --watch\"",
+    "test": "tsx tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coder-ka/esbuild-ts-lib-starter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/coder-ka/esbuild-ts-lib-starter/issues"
+  },
+  "homepage": "https://github.com/coder-ka/esbuild-ts-lib-starter#readme",
+  "devDependencies": {
+    "@types/assert": "^1.5.10",
+    "@types/node": "^22.5.0",
+    "assert": "^2.1.0",
+    "concurrently": "^8.2.2",
+    "esbuild": "^0.20.2",
+    "tsx": "^4.9.3",
+    "typescript": "^5.4.5"
+  }
+}

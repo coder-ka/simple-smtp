@@ -1,7 +1,7 @@
+import dns from "dns/promises";
 import nodemailer from "nodemailer";
 import { SMTPServer } from "smtp-server";
 import fs from "fs/promises";
-import { PassThrough } from "stream";
 import { simpleParser } from "mailparser";
 
 export async function main() {
@@ -41,19 +41,25 @@ export async function main() {
             mailTo.map(async (rcpt) => {
               if (mailFrom) {
                 const targetHost = rcpt.address.split("@")[1];
-                const branch = new PassThrough();
-                stream.pipe(branch);
-                branch.pipe(process.stdout);
-
+                const mxHosts = (await dns.resolveMx(targetHost)).sort(
+                  (a, b) => a.priority - b.priority
+                );
+                if (mxHosts.length === 0) {
+                  throw new Error(
+                    "Cannot send email because MX record not found."
+                  );
+                }
                 const transport = nodemailer.createTransport({
-                  host: process.env.SMTP_DUMMY_TARGET_HOST || targetHost,
+                  host:
+                    process.env.SMTP_DUMMY_TARGET_HOST || mxHosts[0].exchange,
                   port: process.env.SMTP_DUMMY_TARGET_PORT
                     ? Number(process.env.SMTP_DUMMY_TARGET_PORT)
                     : 587,
                 });
 
-                const mail = await simpleParser(branch);
+                const mail = await simpleParser(stream);
 
+                const enableDkim = process.env.SMTP_DKIM === "true";
                 const info = await transport
                   .sendMail({
                     from: mailFrom.address,
@@ -69,6 +75,22 @@ export async function main() {
                       filename: att.filename,
                       content: att.content,
                     })),
+                    dkim: enableDkim
+                      ? {
+                          keys: [
+                            {
+                              domainName: process.env
+                                .SMTP_DKIM_DOMAIN_NAME as string,
+                              keySelector: process.env
+                                .SMTP_DKIM_KEY_SELECTOR as string,
+                              privateKey: process.env
+                                .SMTP_DKIM_PRIVATE_KEY as string,
+                              cacheDir: "/tmp",
+                              cacheTreshold: 100 * 1024,
+                            },
+                          ],
+                        }
+                      : undefined,
                   })
                   .catch((err) => {
                     console.error(err);

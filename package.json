@@ -1,8 +1,9 @@
 {
-  "name": "esbuild-ts-lib-starter",
+  "name": "@coder-ka/simple-smtp",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.cjs",
+  "bin": {},
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -16,6 +17,7 @@
     "package.json"
   ],
   "scripts": {
+    "start": "node dist/index.cjs",
     "build:cjs": "esbuild src/index.ts --bundle --format=cjs --outfile=dist/index.cjs",
     "build:esm": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.mjs",
     "build": "tsc && npm run build:esm && npm run build:cjs",
@@ -28,22 +30,29 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/coder-ka/esbuild-ts-lib-starter.git"
+    "url": "git+https://github.com/coder-ka/simple-smtp.git"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/coder-ka/esbuild-ts-lib-starter/issues"
+    "url": "https://github.com/coder-ka/simple-smtp/issues"
   },
-  "homepage": "https://github.com/coder-ka/esbuild-ts-lib-starter#readme",
+  "homepage": "https://github.com/coder-ka/simple-smtp#readme",
   "devDependencies": {
     "@types/assert": "^1.5.10",
+    "@types/mailparser": "^3.4.4",
     "@types/node": "^22.5.0",
+    "@types/smtp-server": "^3.5.10",
     "assert": "^2.1.0",
     "concurrently": "^8.2.2",
     "esbuild": "^0.20.2",
     "tsx": "^4.9.3",
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "mailparser": "^3.7.1",
+    "nodemailer": "^6.9.15",
+    "smtp-server": "^3.13.4"
   }
 }
